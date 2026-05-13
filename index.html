@@ -320,7 +320,7 @@ function renderCard(c){
   let body='';
   if(isOpen){
     const contacts=(c.phone||c.email)?`<div style="margin-bottom:12px;">
-      ${c.phone?`<a href="tel:${esc(c.phone)}" class="contact-btn" style="color:#60a5fa;">📞 ${esc(c.phone)}</a>`:''}
+      ${c.phone?`<a href="https://wa.me/55${esc(c.phone.replace(/\D/g,''))}" target="_blank" class="contact-btn" style="color:#25d366;">💬 WhatsApp</a>`:''}
       ${c.email?`<a href="mailto:${esc(c.email)}" class="contact-btn" style="color:#a78bfa;">✉ ${esc(c.email)}</a>`:''}
     </div>`:'';
     const vals=(c.received!=null||c.pending!=null)?`<div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
@@ -453,10 +453,7 @@ function buildForm(c,isNew){
         <textarea id="f-details">${isNew?'':(c.details||'')}</textarea></div>
       <div><span class="lbl">Ações Recomendadas (uma por linha)</span>
         <textarea id="f-actions" style="min-height:80px;">${isNew?'':(c.actions||[]).join('\n')}</textarea></div>
-      <div style="display:flex;align-items:center;gap:12px;padding:4px 0;">
-        <input type="checkbox" id="f-week" ${(!isNew&&c.weekAction)||isNew?'checked':''} style="width:20px;height:20px;accent-color:#f59e0b;flex-shrink:0;"/>
-        <label for="f-week" style="font-size:14px;color:#94a3b8;">⚡ Requer ação esta semana</label>
-      </div>
+      
       <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
         <button class="btn ${isNew?'btn-green':'btn-yellow'}" onclick="saveForm(${isNew},${isNew?-1:(c.id||0)})">${isNew?'+ ADICIONAR CLIENTE':'SALVAR ALTERAÇÕES'}</button>
         <button class="btn btn-gray" onclick="closeModal()">Cancelar</button>
@@ -477,7 +474,7 @@ function saveForm(isNew,id){
     pending: g('f-pending').value!==''?Number(g('f-pending').value):null,
     details: g('f-details').value.trim(),
     actions: g('f-actions').value.split('\n').map(a=>a.trim()).filter(Boolean),
-    weekAction:g('f-week').checked,
+    weekAction:false,
     history: isNew?[]:(clients.find(c=>c.id===id)||{}).history||[],
   };
   if(isNew){clients.push(obj);}
@@ -486,8 +483,17 @@ function saveForm(isNew,id){
   toast(isNew?'✓ Cliente adicionado':'✓ Alterações salvas');
 }
 
-function openNewClient(){ g('modal-content').innerHTML=buildForm(null,true); g('modal').style.display='flex'; }
-function openEdit(id){ g('modal-content').innerHTML=buildForm(clients.find(c=>c.id===id),false); g('modal').style.display='flex'; }
+function openNewClient(){ 
+  g('modal-content').innerHTML=buildForm(null,true); 
+  g('modal').style.display='flex';
+  
+}
+function openEdit(id){ 
+  const c=clients.find(x=>x.id===id);
+  g('modal-content').innerHTML=buildForm(c,false); 
+  g('modal').style.display='flex';
+  
+}
 function closeModal(){ g('modal').style.display='none'; }
 
 // ── Export ────────────────────────────────────────────
